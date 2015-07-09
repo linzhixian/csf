@@ -1,0 +1,9 @@
+id	菜单名称	中文名称	节点	页面地址
+id	key	name	parent	url
+1000	top_manager	系统管理	-1	
+1100	adminuser	用户管理	1000	module/manager/user/index.html
+1111	queryManagerUser	用户查询	1100	
+1112	addAdminUser	添加用户	1100	
+1113	updateAdminUser	修改用户	1100	
+1114	deleteAdminUser	删除用户	1100	
+2	top_gameadmin	功能	-1	

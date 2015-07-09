@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>公告系统</title>
+</head>
+<body>
+<script>
+$(document).ready(function() {
+/* 	var toDate = new Date();
+	$('#starttime').val(myformatter(toDate));
+	$('#starttime').datetimebox('setValue', myformatter(toDate));
+	$('#endtime').val(myformatter(toDate));
+	$('#endtime').datetimebox('setValue', myformatter(toDate)); */
+});
+function myformatter(date) {
+	var y = date.getFullYear();
+	var m = date.getMonth() + 1;
+	var d = date.getDate();
+	var hour = date.getHours();
+	var min = date.getMinutes();
+	var timestr = y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+			+ (d < 10 ? ('0' + d) : d) + " " + hour + ":" + min;
+	//alert("myformatter:"+timestr);
+	return timestr;
+}
+function myparser(s) {
+	if (!s)
+		return new Date();
+	//alert("myparser:"+s);
+	var ss = (s.split('-'));
+	var y = parseInt(ss[0], 10);
+	var m = parseInt(ss[1], 10)-1;
+	//var d = parseInt(ss[2], 10);
+	var ss = (ss[2].split(' '));
+	var d = parseInt(ss[0], 10);
+	var ss = (ss[1].split(':'));
+	var h = parseInt(ss[0], 10);
+
+	var min = parseInt(ss[1], 10);
+
+	if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+		var dd = new Date(y, m, d);
+		dd.setHours(h);
+		dd.setMinutes(min);
+	//	alert("myparser:"+s+":"+myformatter(dd));
+		return dd;
+	} else {
+
+		return new Date();
+	}
+}
+
+function update_page(result) {
+	var gdJson = result["updateNoticeResponse"];
+	//alert(JSON.stringify(result));
+	$('#datagrid').datagrid({
+		url : null,
+		data : gdJson
+	});
+	//alert(JSON.stringify(notice_obj))
+};
+
+function submitclick(){
+		queryNoticeList();
+	}
+
+function queryNoticeList(){
+	var id=$('#id').val();
+	var type=$('#type').val();
+	var content=$('#content1').val();
+	var tigger=Number($('#tigger1').val());
+	var repeatnum=Number($('#repeatnum1').val());
+	var scrolltime=Number($('#scrolltime1').val());
+	var intervaltime=Number($('#intervaltime1').val());
+	var iscycle=Number($('#iscycle1').val());
+	var starttime=new Date(Date.parse($("#starttime").datebox("getValue").replace(/-/g, "/"))).getTime();
+	var endtime=new Date(Date.parse($("#endtime").datebox("getValue").replace(/-/g, "/"))).getTime();
+	//alert(content+" "+tigger+" "+repeatnum+" "+scrolltime+" "+intervaltime+" "+iscycle+" "+starttime+" "+endtime);
+	if(content.length !=0 && repeatnum.length !=0&&scrolltime.length !=0 &&tigger.length !=0 &&
+			intervaltime.length !=0 &&iscycle.length !=0 &&$("#starttime").datebox("getValue").length !=0 &&$("#endtime").datebox("getValue").length !=0 ){
+		var noticejsonobj={"updateNotice":{"id":id,"type":type,"content":content,"tigger":tigger,"repeatnum":repeatnum,"scrolltime":scrolltime,"intervaltime":intervaltime,
+			"iscycle":iscycle,"starttime":starttime,"endtime":endtime}};
+		//alert(JSON.stringify(noticejsonobj));
+		$.submitControl(noticejsonobj, $.submitResult);
+	}else{
+		$.messager.alert("提示", "请填写完整数据！");
+	}
+	
+}
+function queryupdate_page(result) {
+	var gdJson = result["noticeResponse"];
+	//alert(JSON.stringify(result));
+	$('#datagrid').datagrid({
+		url : null,
+		data : gdJson
+	});
+};
+$.submitResult = function(jsonResult) {
+	alert(JSON.stringify(jsonResult));
+	var code = jsonResult["code"];
+	if (code == 1) {
+		$.messager.show({
+			title : '提示',
+			msg : '修改成功',
+			timeout : 3000,
+			showType : 'slide'
+		});
+		var noticejsonobj={"notice":{"type":2}};
+		$.submitControl(noticejsonobj, queryupdate_page);
+		window.location.reload();
+	} else {
+		$.messager.alert('警告', '修改失败！错误码:' + code);
+	}
+	$('#dd').window('close');
+}
+</script>
+	<div>
+		<table border="0" width="1000" height="300" cellspacing="0" cellpadding="0">
+			<tr>
+				<td></td>
+				<td></td>
+				<td width="250"></td>
+			</tr>
+			
+			<tr>
+				<td align="center" colspan="5" >
+					<textarea rows="10" cols="100" id="content1">
+						
+					</textarea>
+				</td>
+			</tr>
+			
+
+			<tr>
+			<input width="10" id="id" type="text" hidden="true">
+			<input width="10" id="type" type="text" hidden="true">
+				<td>&nbsp;触&nbsp;&nbsp;&nbsp;发:<input width="10" id="tigger1" type="text"></td>
+				<td>重复次数:<input width="10" id="repeatnum1" type="text"></td>
+				<td>滚屏时间:<input width="10" id="scrolltime1" type="text"></td>
+			</tr>
+			
+			<tr>
+				<td>间隔时间:<input width="10" id="intervaltime1" type="text"></td>
+				<td>是否循环:<input width="10" id="iscycle1" type="text"></td>
+				<td></td>
+			</tr>
+			
+			<tr>
+				<td>开始时间:<input id="starttime" name="timeFrom" type="text" class="easyui-datetimebox" required="required"
+					data-options="formatter:myformatter,parser:myparser"  missingMessage="日期必须填写" editable="false"></td>
+				<td>结束时间:<input id="endtime" name="timeFrom" type="text" class="easyui-datetimebox" required="required"
+					data-options="formatter:myformatter,parser:myparser" missingMessage="日期必须填写" editable="false"></td>
+				<td><button id="tb" class="easyui-linkbutton"  onclick="submitclick()"name="notice" >保存</button></td>
+			</tr>
+		</table>
+	</div>
+</body>
+</html>

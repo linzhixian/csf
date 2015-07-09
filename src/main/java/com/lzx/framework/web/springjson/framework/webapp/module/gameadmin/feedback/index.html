@@ -1,0 +1,193 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<style type="text/css">
+.datagrid-toolbar {
+	padding-left: 760px
+}
+</style>
+<script>
+	var lastIndex;
+	var gridRowsJson;
+	$(document).ready(function() {
+		$.fn.datebox.defaults.formatter = function(date) {
+			var y = date.getFullYear();
+			var m = date.getMonth() + 1;
+			var d = date.getDate();
+			return y + '-' + m + '-' + d;
+		}
+
+		
+		var toDate = new Date();
+		toDate.setHours(23, 59,59);
+		$('#ddTo').val(myformatter(toDate));
+		$('#ddTo').datetimebox('setValue', myformatter(toDate));
+		
+		var fromDate = new Date();
+		fromDate.setDate(fromDate.getDate() - 7);
+		fromDate.setHours(0, 0, 0, 0);
+		$('#ddFrom').val(myformatter(fromDate));		
+		$('#ddFrom').datetimebox('setValue', myformatter(fromDate));
+
+		$('#datagrid').datagrid({
+			url : null,
+
+			onClickCell : function(rowIndex, field, value) {
+				if (field == "reply") {
+					if (lastIndex != rowIndex) {
+						$('#datagrid').datagrid('endEdit', lastIndex);
+						$('#datagrid').datagrid('beginEdit', rowIndex);
+					}
+					lastIndex = rowIndex;
+				} else if (field == "rolename") {
+					var uid = gridRowsJson[rowIndex]["uid"];
+					$('#dd').dialog({
+						title : '给用户[' + value + "]发消息",
+						width : 400,
+						height : 200,
+						closed : false,
+						cache : false,
+						href : 'sendMessage.html',
+						modal : true,
+						onLoad : function() {
+							$("#dd #uid").val(uid);
+						}
+					});
+					//$('#dd').dialog('open', 'sendMessage.html');
+					//alert(uid);
+				}
+			}
+		});
+		$("#querySubmit").click();
+	});
+
+	function update_page(result) {
+		var gdJson = result["queryFeedBackResponse"];
+		gridRowsJson = gdJson["rows"];
+		//alert(JSON.stringify(result));
+		$('#datagrid')
+				.datagrid(
+						{
+							url : null,
+							data : gdJson,
+							//	pagination : true,
+							rownumbers : true,
+							//pageSize:5,
+							//pageList: [5,10,15],
+							//beforePageText: '第',
+							//afterPageText: '页    共 {pages} 页', 
+							//displayMsg: '当前显示 {from} - {to} 条记录   共 {total} 条记录',
+							toolbar : [ {
+								text : '发送',
+								iconCls : 'icon-save',
+								handler : function() {
+									$('#datagrid').datagrid('endEdit',
+											lastIndex);
+									//alert($('#datagrid').datagrid('getChanges').length);
+									if ($('#datagrid').datagrid('getChanges').length) {
+										var updated = $('#datagrid').datagrid(
+												'getChanges', "updated");
+										if (updated.length) {
+											var submitStr = JSON
+													.stringify(updated);
+											$.submitBatchSave("feedBackUpdate",
+													updated);
+										}
+
+									}
+								}
+							} ]
+						});
+	};
+</script>
+<script type="text/javascript">
+	function myformatter(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		var d = date.getDate();
+		var hour = date.getHours();
+		var min = date.getMinutes();
+		var timestr = y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+				+ (d < 10 ? ('0' + d) : d) + " " + hour + ":" + min;
+		//alert("myformatter:"+timestr);
+		return timestr;
+	}
+	function myparser(s) {
+		if (!s)
+			return new Date();
+		//alert("myparser:"+s);
+		var ss = (s.split('-'));
+		var y = parseInt(ss[0], 10);
+		var m = parseInt(ss[1], 10)-1;
+		//var d = parseInt(ss[2], 10);
+		var ss = (ss[2].split(' '));
+		var d = parseInt(ss[0], 10);
+		var ss = (ss[1].split(':'));
+		var h = parseInt(ss[0], 10);
+
+		var min = parseInt(ss[1], 10);
+
+		if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+			var dd = new Date(y, m, d);
+			dd.setHours(h);
+			dd.setMinutes(min);
+		//	alert("myparser:"+s+":"+myformatter(dd));
+			return dd;
+		} else {
+
+			return new Date();
+		}
+	}
+	function d_close() {
+		$('#dd').dialog('close');
+	}
+</script>
+</head>
+<body class="easyui-layout" style="overflow-y: hidden">
+
+	<div data-options="region:'north',split:true" style="height: 50px;" style="overflow:hidden">
+
+		<div style="overflow: hidden; position: relative; top: 10px; left: 30px; width: 90%; height: 100%">
+			<form id="ff" method="get">
+				<label for="name">反馈提交时间:</label> <input id="ddFrom" name="timeFrom" type="text" class="easyui-datetimebox" required="required"
+					data-options="formatter:myformatter,parser:myparser" missingMessage="日期必须填写" editable="false">至 <input id="ddTo" name=timeTo type="text"
+					class="easyui-datetimebox" editable="false" required="required" data-options="formatter:myformatter,parser:myparser"> <input type="radio" value="0"
+					name="reply" checked>全部 <input type="radio" value="1" name="reply">未回复 <input type="radio" value="2" name="reply">已回复 &nbsp;&nbsp;&nbsp;
+				<button id="querySubmit" name="queryFeedBack" type="button">查 询</button>
+				         &nbsp;&nbsp;&nbsp;Tips：点“昵称”给用户发消息，点“答复”给用户答复！
+			</form>
+		</div>
+
+	</div>
+	<div data-options="region:'center'" style="background: #eee; overflow: auto;">
+		<table id="datagrid" class="easyui-datagrid" style="width: 900px; height: 500px" data-options="fitColumns:true,singleSelect:true">
+			<thead>
+				<tr>
+					<th data-options="field:'id',hidden:'true'">ID</th>
+					<th data-options="field:'rtime',width:140">时间</th>
+					<th data-options="field:'uid',width:100">用户ID</th>
+					<th data-options="field:'rolename',width:100,align:'center'" title='点击给用户发送消息'>昵称</th>
+					<th data-options="field:'content',width:300,align:'center'">内容</th>
+					<th data-options="field:'contacts',width:100,align:'center'">联系</th>
+					<th data-options="field:'reply',width:300,align:'center',editor:'text',width:'180px'" title='点击给用户发送答复消息'>答复</th>
+				</tr>
+			</thead>
+		</table>
+		<div id="dd">
+		</div>
+	</div>
+</body>
+
+</html>

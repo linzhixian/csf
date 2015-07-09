@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>用户封停</title>
+</head>
+<body>
+	<script>
+
+		$('#tb').linkbutton({
+			width:'50px',
+			height:'30px'
+		});
+		function sealclick() {
+			var radio = $('input[name="seal"]').filter(':checked');
+			if(radio.length){
+			var value=radio.val();
+			}else{
+			$.messager.alert("提示", "请选择封停时间！");
+			return ;
+			}
+			var msg={};
+			msg["sealnum"]=value;
+			msg["uid"]=$('#uid').val();
+			var jjj={};
+			jjj["sealUser"]=msg;
+			$.submitControl(jjj,$.submitSendmessageResult);
+			}
+		
+		$.submitSendmessageResult = function(jsonResult) {
+			var code=jsonResult["code"];
+			if(code==1) {
+				$.messager.show({
+					title:'提示',
+					msg:'用户封停成功',
+					timeout:3000,
+					showType:'slide'
+				});
+				$('#dd').window('close');
+				$("#querySubmit").click();
+			} else {
+				$.messager.alert('警告','封停失败！错误码:'+code);
+			}
+		}
+	</script>
+	账号封停
+	<br />
+	<br />
+	<table width="800" id="sealtable">
+	<input id="uid" type="text" style="display:none">
+		<tr>
+			<td width="150"><label><input name="seal" type="radio" value="1" />1天 </label></td>
+			<td width="150"><label><input name="seal" type="radio" value="3" />3天 </label></td>
+			<td width="150"><label><input name="seal" type="radio" value="10" />10年 </label></td>
+			<td width="350"><label><button id="tb" class="easyui-linkbutton"  onclick="sealclick()"name="SealUser" >封停</button></label></td>
+		</tr>
+	</table>
+</body>
+</html>

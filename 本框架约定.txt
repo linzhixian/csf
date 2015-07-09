@@ -1,0 +1,24 @@
+Socket服务器约定：
+
+  名称解释：
+ message 为通讯的消息类 例如：LoginRequest
+ commandAction 对应消息的处理动作，一个消息对应一个类，类名约定为消息类名+Action,例如：LoginRequestAction
+ 机制：消息注册采用Spring自动加载然后按名字自动注册：
+   a) Spring配置文件server.xml启用autowire
+        <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
+    	<context:component-scan base-package="com.lzx.framework.socket.netty3" />
+		<!-- enable autowire -->
+	    <context:annotation-config />
+    b) 消息类并设置正确的cmd，加类注解：@Service("loinRequest_MessageLZX") 后缀名必须为：_MessageLZX,例如：loinRequest_MessageLZX
+    c) 对应CommandAcion serviceName 必须为：消息类名的前缀加Action__ActionLZX,后缀名必须为：_ActionLZX,,  例如：loinRequestAction_ActionLZX
+    
+    
+Rmi服务器约定：
+
+  机制：rmi绑定采用Spring自动加载然后按接口名自动绑定
+     a) Spring配置文件server.xml启用autowire
+        <!-- enable component scanning (beware that this does not enable mapper scanning!) -->
+    	<context:component-scan base-package="com.csxy.lol.datacenter.services" /><!-设定要加载的bean的包路径->
+		<!-- enable autowire -->
+	    <context:annotation-config />
+      b) Service名必须以"_RMI"结尾,且只实现一个接口，接口名后缀为"Service"

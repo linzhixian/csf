@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<script type="text/javascript" src="../../../js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="../../../easyui/datagrid-detailview.js"></script>
+<title>道具发放</title>
+<script>
+$(document).ready(function() {
+	$("#userid").click(function() {
+				if (($("#userid").val() == null
+						|| $("#userid").val().length == 0
+						|| $("#userid").val()[0] == null || $(
+						"#userid").val()[0] == "")
+						&& ($("#userrolename")
+								.val() == null
+								|| $(
+										"#userrolename")
+										.val().length == 0
+								|| $(
+										"#userrolename")
+										.val()[0] == null || $(
+								"#userrolename")
+								.val()[0] == "")) {
+					$("#userid").validatebox({
+						required : false,
+						validType : "text",
+					});
+					$("#userrolename").validatebox(
+							{
+								required : false,
+								validType : "text",
+							});
+				}
+
+			});
+
+$("#userrolename").click(function() {
+				if (($("#userid").val() == null
+						|| $("#userid").val().length == 0
+						|| $("#userid").val()[0] == null || $(
+						"#userid").val()[0] == "")
+						&& ($("#userrolename")
+								.val() == null
+								|| $(
+										"#userrolename")
+										.val().length == 0
+								|| $(
+										"#userrolename")
+										.val()[0] == null || $(
+								"#userrolename")
+								.val()[0] == "")) {
+					$("#userid").validatebox({
+						required : false,
+						validType : "text",
+					});
+					$("#userrolename").validatebox(
+							{
+								required : false,
+								validType : "text",
+							});
+				}
+
+			});
+$("#assign").click(function() {
+if ( ($("#userid").val().length != 0&&$("#propid1").val().length != 0&&$("#propnum1").val().length != 0) ||
+		($("#userid").val().length != 0&&$("#propid2").val().length != 0&&$("#propnum2").val().length != 0) ||
+		($("#userid").val().length != 0&&$("#propid3").val().length != 0&&$("#propnum3").val().length != 0) ||
+		($("#userid").val().length != 0&&$("#propid4").val().length != 0&&$("#propnum4").val().length != 0) ||
+		($("#userid").val().length != 0&&$("#propid5").val().length != 0&&$("#propnum5").val().length != 0) 
+		) {
+	var assignprop_Id=["1001","1002","1003","1004","1005","2001","2002","2003","2004","3001","3002","3003","3004","3005","3006","5001","5004","5006","5002","5005","6001","6002","6003","6004"];
+	var id1=0;
+	var id2=0;
+	var id3=0;
+	var id4=0;
+	var id5=0;
+	for(var i=0;i<assignprop_Id.length;i++){
+		if(assignprop_Id.indexOf($('#propid1').val())==(-1)&&$('#propid1').val()!=""){
+			id1=1;
+		}
+		if(assignprop_Id.indexOf($('#propid2').val())==(-1)&&$('#propid2').val()!=""){
+			id2=1;
+		}
+		if(assignprop_Id.indexOf($('#propid3').val())==(-1)&&$('#propid3').val()!=""){
+			id3=1;
+		}
+		if(assignprop_Id.indexOf($('#propid4').val())==(-1)&&$('#propid4').val()!=""){
+			id4=1;
+		}
+		if(assignprop_Id.indexOf($('#propid5').val())==(-1)&&$('#propid5').val()!=""){
+			id5=1;
+		}
+	}
+	var idval=new Array(5);
+	if(id1==1){
+		idval[0]=$('#propid1').val();
+	}else{
+		idval[0]="";
+	}
+	if(id2==1){
+		idval[1]=$('#propid2').val();
+	}else{
+		idval[1]="";
+	}
+	if(id3==1){
+		idval[2]=$('#propid3').val();
+	}else{
+		idval[2]="";
+	}
+	if(id4==1){
+		idval[3]=$('#propid4').val();
+	}else{
+		idval[3]="";
+	}
+	if(id5==1){
+		idval[4]=$('#propid5').val();
+	}else{
+		idval[4]="";
+	}
+	if(id1==1||id2==1||id3==1||id4==1||id5==1){
+		$.messager.alert("提示", idval[0]+" "+idval[1]+" "+idval[2]+" "+idval[3]+" "+idval[4]+" "+"道具ID不存在！");
+		return;
+	}
+	var assign={"userPropAssign":[{"uid":$('#userid').val(),"id":$('#propid1').val()==""?null:$('#propid1').val(),"num":$('#propnum1').val()==""?null:$('#propnum1').val()}, 
+	            {"uid":$('#userid').val(),"id":$('#propid2').val()==""?null:$('#propid2').val(),"num":$('#propnum2').val()==""?null:$('#propnum2').val()},
+	            {"uid":$('#userid').val(),"id":$('#propid3').val()==""?null:$('#propid3').val(),"num":$('#propnum3').val()==""?null:$('#propnum3').val()},
+	            {"uid":$('#userid').val(),"id":$('#propid4').val()==""?null:$('#propid4').val(),"num":$('#propnum4').val()==""?null:$('#propnum4').val()},
+	            {"uid":$('#userid').val(),"id":$('#propid5').val()==""?null:$('#propid5').val(),"num":$('#propnum5').val()==""?null:$('#propnum5').val()}
+	            ]};
+	$.submitControl(assign,$.submitSendmessageResult);
+}else{
+	$.messager.alert("提示", "至少填写一组用户ID，道具ID，数量！");
+}
+			
+});
+});
+
+$.submitSendmessageResult = function(jsonResult) {
+	//alert(JSON.stringify(jsonResult));
+	var code=jsonResult["code"];
+	if(code==1) {
+		//$.messager.show('提示','发送完毕');
+		$.messager.show({
+			title:'提示',
+			msg:'发放完毕',
+			timeout:3000,
+			showType:'slide'
+		});
+		$('#dd').window('close');
+	} else {
+		$.messager.alert('警告','发放失败,未查询到该用户！错误码:'+code);
+	}
+}
+function myValidate(myValidate) {
+	if (($("#userid").val() == null || $("#userid").val().length == 0
+			|| $("#userid").val()[0] == null || $("#userid").val()[0] == "")
+			&& ($("#userrolename").val() == null
+					|| $("#userrolename").val().length == 0
+					|| $("#userrolename").val()[0] == null || $(
+					"#userrolename").val()[0] == "")) {
+
+		$("#userid").validatebox({
+			required : true,
+			validType : "text",
+			missingMessage : '用户ID和昵称必填一个'
+		});
+		$("#userrolename").validatebox({
+			required : true,
+			validType : "text",
+			missingMessage : '用户ID和昵称必填一个'
+		});
+		// alert("用户ID和昵称必填一个");
+		$.messager.alert("提示", "用户ID和昵称必填一个！");
+		return false;
+	} else {
+		return true;
+	}
+	return true;
+}
+
+function allassign(data) {
+	$.ajax({
+		url : '/gameadmin/upload/submit', // 后台处理程序
+		type : 'post', // 数据发送方式
+		dataType : 'json', // 接受数据格式
+		contentType : "application/json;charset=utf-8",
+		success : function(data){    
+	        var code=JSON.stringify(data["code"]);
+	    	if(code==1) {
+	    		$.messager.alert("提示", "批量发放道具成功！");
+	    	}else if(code==6){
+	    		$.messager.alert("提示", "请上传TXT文件！");
+	    	}else{
+	    		var error=data["rows"]
+	    		$.messager.alert("提示", "用户"+error+"不存在,"+"批量发放道具失败！");
+	    	}
+	    },
+		error : errorCallbackFunction
+	});
+}
+
+
+function ajaxFileUpload()
+{
+    $.ajaxFileUpload
+    (
+        {
+            url:'/gameadmin/upload/file',
+            type: 'post',
+            secureuri:false,
+            fileElementId:'myfiles',
+            dataType: 'json',
+            success: function(data, status){ 
+            	var code=data["code"];
+                if(code==1){
+                	$.messager.alert("提示", "文件上传成功！请提交数据！");
+                }else if(code==5){
+                	$.messager.alert("提示", "文件类型不合法,请上传文本文件制表符格式TXT文件！");
+                }else if(code==4){
+                	$.messager.alert("提示", "请填写用户数据！");
+                }else if(code==6){
+                	$.messager.alert("提示", "请上传TXT文件！");
+                }
+            },
+            error: function(data, status, e){ 
+            	$.messager.alert("提示", "ajax错误！");
+            }
+        }
+    )
+}  
+
+</script>
+</head>
+<body>
+		<h3>&nbsp;&nbsp;&nbsp;&nbsp;单个道具发放</h3>
+
+			
+				<div>
+				<table border="0" width="1000" height="300"  cellspacing="0" cellpadding="0">
+					<tr>
+					<td width="250">
+				用户ID:<input width="10"  align="left" id="userid" name="id" type="text"  class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td> 
+					<td width="250">
+				道具ID:<input width="10"  align="left" id="propid1" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td width="250">
+				数量:<input width="10"  align="left" id="propnum1" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td width="250">
+					</td>
+					</tr>
+					
+					<tr>
+					<td>
+					</td> 
+					<td>
+				道具ID:<input width="10"  align="left" id="propid2" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+				数量:<input width="10"  align="left" id="propnum2" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+					</td>
+					</tr>
+					
+					<tr>
+					<td>
+					</td> 
+					<td>
+				道具ID:<input width="10"  align="left" id="propid3" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+				数量:<input width="10"  align="left" id="propnum3" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+					</td>
+					</tr>
+					
+					<tr>
+					<td>
+					</td> 
+					<td>
+				道具ID:<input width="10"  align="left" id="propid4" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+				数量:<input width="10"  align="left" id="propnum4" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+					</td>
+					</tr>
+					
+					<tr>
+					<td>
+					</td> 
+					<td>
+				道具ID:<input width="10"  align="left" id="propid5" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+				数量:<input width="10"  align="left" id="propnum5" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+					</td>
+					<td>
+					</td>
+					</tr>
+					
+					<tr>
+					<td>
+					</td> 
+					<td>
+					</td>
+					<td>
+					</td>
+					<td>
+					<button id="assign" name="userPropAssign" type="button">提交</button>
+					</td>
+					</tr>
+				</table>
+				</div>
+				
+				
+
+				
+				<div style="background:#F0F0F0; width:100%; height:470px">
+				<h3>&nbsp;&nbsp;&nbsp;&nbsp;批量道具发放</h3>
+				<table border="0"  cellspacing="0" cellpadding="0">
+					<tr>
+					<td width="400" height="70" align="right">
+					<input id="myfiles" name="myfiles" type="file" >
+					</td> 
+					<td width="50" height="70">
+					</td>
+					<td width="50" height="70">
+				<button id="uploadfile" type="submit" onclick="ajaxFileUpload()">上传</button>
+				<!-- <input class="easyui-filebox" name="myfiles" data-options="prompt:'请选择一个文件上传',buttonText:'浏览'" > -->
+					</td>
+					<td width="283" height="70">
+					</td>
+					</tr>
+					
+					
+					<tr>
+					<td width="400" height="70">
+					</td> 
+					<td width="50" height="70">
+					</td>
+					<td width="50" height="70">
+					</td >
+					<td width="283" height="70" align="right">
+					<button id="all"  type="button" onclick="allassign()">提交</button>
+					</td>
+					</tr>
+					
+				</table>
+				</div>
+
+</body>
+</html>

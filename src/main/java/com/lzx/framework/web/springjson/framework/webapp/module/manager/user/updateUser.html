@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<title>Insert title here</title>
+</head>
+<body>
+	<script>
+		var isShowPlatformAndGameSelect = this.parent.isShowPlatformAndGameSelect;
+		$('#btn').linkbutton({
+			iconCls : 'icon-save'
+		});
+		$(function() {
+			$(function() {
+				$('#btn').bind(
+						'click',
+						function() {
+							var nodes = $('#tt').tree('getChecked',
+									[ 'checked', 'indeterminate' ]);
+							var menuPermission = [];
+							for ( var i = 0; i < nodes.length; i++) {
+								menuPermission.push(nodes[i].id);
+							}
+							if (menuPermission.length == 0) {
+								$.messager.alert('提示', '请选择用户权限');
+								return;
+							}
+							var chk_value = [];
+							if (isShowPlatformAndGameSelect) {
+								$('input[name="gamename"]:checked').each(
+										function() {
+											//chk_value+='"'+$(this).val()+'",'; 
+											chk_value.push($(this).val());
+										});
+								if (chk_value.length == 0) {
+									$.messager.alert('提示', '请选择游戏');
+									return;
+								}
+							}
+							$.onSubmitClick(this, $.submitSendmessageResult,
+									false, JSON.stringify(menuPermission), JSON
+											.stringify(chk_value));
+						});
+			});
+		});
+		$.submitSendmessageResult = function(jsonResult) {
+			var code = jsonResult["code"];
+			if (code == 1) {
+				//$.messager.show('提示','发送完毕');
+				$.messager.show({
+					title : '提示',
+					msg : '操作完毕',
+					timeout : 3000,
+					showType : 'slide'
+				});
+				$('#update_dd').window('close');
+				//$("#querySubmit").click(); 
+				//window.location.reload();
+
+			} else if (code == 7) {
+				$.messager.alert('错误', '操作失败!');
+
+			} else {
+				$.messager.alert('警告', '发送失败！错误码:' + code);
+			}
+		}
+		$.submitQuerygamenameResult = function(jsonResult) {
+			var querygamecheckbox = jsonResult["queryUserGamePermissionResponse"];
+			var allgames = querygamecheckbox["allgames"];
+			var currentgames = JSON
+					.stringify(querygamecheckbox["currentgames"]);
+			var arr = new Array();
+			var myobj = eval(allgames);
+			for ( var i = 0; i < myobj.length; i++) {
+				arr.push(myobj[i]);
+			}
+			var gamecheckboxhtml2 = "";
+			for ( var j = 0; j < arr.length; j++) {
+				var gamecheckboxhtml = "<input type='checkbox' name='gamename' value='";
+				gamecheckboxhtml += arr[j].name + "'";
+				var ischecked = currentgames.indexOf((arr[j].name)) > -1;
+				//alert("currentgames:"+currentgames+",name:"+arr[j].name);
+				if (ischecked) {
+					gamecheckboxhtml += " checked='" + ischecked + "'";
+				}
+				gamecheckboxhtml += ">";
+				gamecheckboxhtml += arr[j].cn_name;
+				gamecheckboxhtml2 += gamecheckboxhtml;
+
+			}
+			document.getElementById("gameff").innerHTML = gamecheckboxhtml2;
+		}
+		$(document).ready(function() {
+
+		});
+		function initUpdatePage() {
+			if (isShowPlatformAndGameSelect) {
+				initGameCheckbox();
+			} else {
+				$("#gameSelect").hide();
+			}
+			initMenuTree();
+		}
+		function initMenuTree() {
+			var userid = $("#id").val();
+			var mt = {
+				"getAddORupdatePermissionTree" : {
+					"id" : userid
+				}
+			};
+			$.submitMenutreeResult = function(jsonResult) {
+				var tree_data2 = jsonResult["getAddORupdatePermissionTreeResponse"]["rows"];
+				var tree_data = tree_data2;
+				$('#tt').tree({
+					checkbox : true,
+					data : tree_data
+				});
+			}
+			$.submitControl(mt, $.submitMenutreeResult);
+
+		}
+		function initGameCheckbox() {
+			var userid = $("#id").val();
+			var querygamename = {
+				"queryUserGamePermission" : {
+					"id" : userid
+				}
+			};
+			$.submitControl(querygamename, $.submitQuerygamenameResult);
+			$("#modifycheck").click(function() {
+				if ($("#modifycheck").prop("checked") == true) {
+					$('input[name=password]').removeAttr("disabled");
+				} else {
+					$('input[name=password]').attr("disabled", "disabled");
+				}
+			});
+		}
+		function check(obj) {
+			for (i = 0; i < document.all(obj).length; i++) {
+				if (document.all(obj)(i).checked) {
+					return;
+				}
+			}
+			window.alert('一个也没有选！');
+		}
+	</script>
+	<br>
+	<form id="ff" method="get">
+		&nbsp;&nbsp;<a id="btn" href="#" name="updateAdminUser">保存</a>
+		<hr size=1 />
+
+		<table width="350" align="center" style="color:#EEEEEE">
+			<tr>
+				<td align="center"><input id="id" name="id" type="text" style="display: none"></td>
+			</tr>
+			<!-- 			<tr>
+				<td>新密码:<input class="easyui-validatebox" type="text" id="password" name="password" data-options="required:true" missingMessage="密码必须填写" disabled="true"/>&nbsp;<input type='checkbox' id='modifycheck' name='modifycheck' />修改密码</td>
+			</tr> -->
+			<tr id="gameSelect">
+				<td>
+					<div>
+						<fieldset>
+							<legend>游戏</legend>
+							<div id="gameff"></div>
+						</fieldset>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div>
+						<fieldset>
+							<legend>权限管理</legend>
+							<ul id="tt"></ul>
+						</fieldset>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</form>
+	&nbsp;注：取消【用户管理】的权限会导致该用户创建的子用户都被删除
+</body>
+</html>

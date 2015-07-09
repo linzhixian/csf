@@ -1,0 +1,164 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<style type="text/css">
+.datagrid-toolbar {
+	padding-left: 760px
+}
+</style>
+<script>
+	$(document).ready(function() {
+		$.fn.datebox.defaults.formatter = function(date) {
+			var y = date.getFullYear();
+			var m = date.getMonth() + 1;
+			var d = date.getDate();
+			return y + '-' + m + '-' + d;
+		}
+
+		
+		var toDate = new Date();
+		toDate.setHours(23, 59,59);
+		$('#ddTo').val(myformatter(toDate));
+		$('#ddTo').datetimebox('setValue', myformatter(toDate));
+		
+		var fromDate = new Date();
+		fromDate.setDate(fromDate.getDate() - 7);
+		fromDate.setHours(0, 0, 0, 0);
+		$('#ddFrom').val(myformatter(fromDate));		
+		$('#ddFrom').datetimebox('setValue', myformatter(fromDate));
+		
+			$("#userid").click(function() {
+			if (($("#userid").val() == null
+					|| $("#userid").val().length == 0
+					|| $("#userid").val()[0] == null || $(
+					"#userid").val()[0] == "")) {
+				$("#userid").validatebox({
+					required : false,
+					validType : "text",
+				});
+				
+			}
+			}); 
+	});
+
+	function update_page(result) {
+		//alert(JSON.stringify(result));
+		var gdJson = result["diamondRecordResponse"];
+		gridRowsJson = gdJson["rows"];
+		$('#datagrid').datagrid({
+			url : null,
+			data : gridRowsJson
+		});
+		
+	};
+</script>
+<script type="text/javascript">
+	function myformatter(date) {
+		var y = date.getFullYear();
+		var m = date.getMonth() + 1;
+		var d = date.getDate();
+		var hour = date.getHours();
+		var min = date.getMinutes();
+		var timestr = y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+				+ (d < 10 ? ('0' + d) : d) + " " + hour + ":" + min;
+		//alert("myformatter:"+timestr);
+		return timestr;
+	}
+	function myparser(s) {
+		if (!s)
+			return new Date();
+		//alert("myparser:"+s);
+		var ss = (s.split('-'));
+		var y = parseInt(ss[0], 10);
+		var m = parseInt(ss[1], 10)-1;
+		//var d = parseInt(ss[2], 10);
+		var ss = (ss[2].split(' '));
+		var d = parseInt(ss[0], 10);
+		var ss = (ss[1].split(':'));
+		var h = parseInt(ss[0], 10);
+
+		var min = parseInt(ss[1], 10);
+
+		if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+			var dd = new Date(y, m, d);
+			dd.setHours(h);
+			dd.setMinutes(min);
+		//	alert("myparser:"+s+":"+myformatter(dd));
+			return dd;
+		} else {
+
+			return new Date();
+		}
+	}
+	function d_close() {
+		$('#dd').dialog('close');
+	}
+	
+	function myValidate(myValidate) {
+		if (($("#userid").val() == null || $("#userid").val().length == 0
+				|| $("#userid").val()[0] == null || $("#userid").val()[0] == "")) {
+
+			$("#userid").validatebox({
+				required : true,
+				validType : "text",
+				missingMessage : '用户ID必填'
+			});
+			$.messager.alert("提示", "用户ID必填！");
+			return false;
+		} else {
+			return true;
+		}
+		return true;
+	}
+</script>
+</head>
+<body class="easyui-layout" style="overflow-y: hidden">
+
+	<div data-options="region:'north',split:true" style="height: 50px;" style="overflow:hidden">
+
+		<div style="overflow: hidden; position: relative; top: 10px; left: 30px; width: 90%; height: 100%">
+			<form id="ff" method="get">
+				用户ID:<input width="30" id="userid" name="uid" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'">
+				&nbsp;&nbsp;&nbsp; 
+				<input id="ddFrom" name="beforetime" type="text" class="easyui-datetimebox" required="required"
+					data-options="formatter:myformatter,parser:myparser" missingMessage="日期必须填写" editable="false">&nbsp;至 
+					<input id="ddTo" name="aftertime" type="text"
+					class="easyui-datetimebox" editable="false" required="required" data-options="formatter:myformatter,parser:myparser">
+					&nbsp;&nbsp;&nbsp; 
+				<button id="querySubmit" name="diamondRecord" type="button">查 询</button>
+			</form>
+		</div>
+
+	</div>
+	<div data-options="region:'center'" style="background: #eee; overflow: auto;">
+		<table id="datagrid" class="easyui-datagrid" style="width: 900px; height: 500px" data-options="fitColumns:true,singleSelect:true,remoteSort: false,rownumbers:true">
+			<thead>
+				<tr>
+					<th data-options="field:'id',hidden:'true'">ID</th>
+					<th data-options="field:'time',width:200">时间</th>
+					<th data-options="field:'uid',width:200">用户ID</th>
+					<th data-options="field:'transaction',width:200,align:'center',sortable: true">获取/消耗</th>
+					<th data-options="field:'cost',width:200,align:'center',sortable: true">钻石数量</th>
+					<th data-options="field:'code',width:200,align:'center',sortable: true">渠道/类型</th>
+					<th data-options="field:'num',width:200,align:'center'">付费/数量</th>
+				</tr>
+			</thead>
+		</table>
+		<div id="dd">
+		</div>
+	</div>
+</body>
+
+</html>

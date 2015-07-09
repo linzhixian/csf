@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.funugame.gameadmin.web.dao.UserMapper">
+	<cache eviction="LRU" flushInterval="86400000" size="2048" readOnly="true" />
+
+	<select id="selectList" parameterType="int" resultType="AdminUser">
+		select *
+		from user where createid=#{id} order by type
+	</select>
+
+
+	<select id="selectOneByName" parameterType="string" resultType="AdminUser">
+		select *
+		from user where name=#{name}
+	</select>
+
+	<select id="selectOneByID" parameterType="int" resultType="AdminUser">
+		select *
+		from user where id=#{id}
+	</select>
+
+	<select id="login" parameterType="hashmap" resultType="AdminUser">
+		select *
+		from user where name=#{name} and password=#{password}
+	</select>
+
+	<delete id="delete" parameterType="int">
+		delete from user where id=#{id} or createid=#{id};
+	</delete>
+
+	<insert id="insert" parameterType="AdminUser">
+		insert into user set
+		name=#{name},password=#{password},type=#{type},gamename=#{gamename},createid=#{createid},permission=#{permission};
+	</insert>
+	<update id="update" parameterType="AdminUser">
+		update user
+		<set>
+			<if test="name!=null">name=#{name},</if>
+			<if test="password!=null">password=#{password},</if>
+			<if test="gamename!=null">gamename=#{gamename},</if>
+			<if test="permission!=null">permission=#{permission},</if>
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+
+
+
+	<update id="updatePassword" parameterType="hashmap">
+		update user
+		<set>			
+			password=#{password}
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+
+	<update id="updatePermission" parameterType="AdminUser">
+		update user
+		<set>
+			<if test="gamename!=null">gamename=#{gamename},</if>
+			<if test="permission!=null">permission=#{permission},</if>
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+
+</mapper>

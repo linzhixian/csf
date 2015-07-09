@@ -1,0 +1,191 @@
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<style type="text/css">
+/* .datagrid-toolbar {
+	padding-left: 50px
+} */
+</style>
+<script>
+	var lastIndex;
+	var gridRowsJson;
+	$(document).ready(function() {
+		$('#datagrid').datagrid({
+			url : null
+		});
+		$("#querySubmit").click();
+	});
+
+	function update_page(result) {
+		var gdJson = result["queryManagerUserResponse"];
+		gridRowsJson = gdJson["rows"];
+		$.each(gridRowsJson, function() {
+			var type = this["type"];
+			if (type == 0) {
+				this["type"] = "管理员";
+			} else if (type == 1) {
+				this["type"] = "经理";
+			} else {
+				this["type"] = "普通";
+			}
+		});
+		$('#datagrid').datagrid(
+				{
+					url : null,
+					data : gdJson,
+					rownumbers : true,
+					toolbar : [
+							{
+								text : '新建',
+								iconCls : 'icon-add',
+								handler : function() {
+									$.openDialog($('#add_dd'), '新建用户',
+											'addUser.html');
+								}
+							},
+							'-',
+							{
+								text : '修改权限',
+								iconCls : 'icon-edit',
+								handler : function() {
+									var $selectRow = $("#datagrid").datagrid(
+											"getSelected");
+									if ($selectRow) {
+										var id = $selectRow.id;
+										var name = $selectRow.name;
+										$.onLoadMofiyUse = function() {
+											$("#update_dd #id").val(id);
+											initUpdatePage();
+										}
+										$.openDialog($('#update_dd'), '修改用户权限:'
+												+ name, 'updateUser.html',
+												$.onLoadMofiyUse);
+									} else {
+										$.messager.alert('提示', '请选择要操作的用户！',
+												'info');
+									}
+								}
+							},
+							'-',
+							{
+								text : '重设密码',
+								iconCls : 'icon-edit',
+								handler : function() {
+									var $selectRow = $("#datagrid").datagrid(
+											"getSelected");
+									if ($selectRow) {
+										var id = $selectRow.id;
+										var name = $selectRow.name;
+										$.onLoadMofiyUse = function() {
+											$("#pwd_dd #id").val(id);
+											initUpdatePage();
+										}
+										$.openDialog($('#pwd_dd'), '重设用户密码:'
+												+ name, 'resetPassword.html',
+												$.onLoadMofiyUse);
+									} else {
+										$.messager.alert('提示', '请选择要操作的用户！',
+												'info');
+									}
+								}
+							}, '-', {
+								text : '删除',
+								iconCls : 'icon-remove',
+								handler : function() {
+									$.deleteConfirm($.deleteUser);						
+								}
+
+							} ]
+				});
+	};
+
+	$.openDialog = function(mydailog, title, url, onLoadFunction) {
+		mydailog.dialog({
+			title : title,
+			width : 800,
+			height : 600,
+			closed : false,
+			cache : false,
+			href : url,
+			modal : true,
+			onClose : function() {
+				//$("#querySubmit").click(); 
+				window.location.reload();
+				//mydailog.dialog('destroy', true);
+			},
+			onLoad : onLoadFunction
+		});
+	};
+	$.deleteUser = function() {
+		var $selectRow = $("#datagrid").datagrid("getSelected");
+		if ($selectRow) {
+			var msg = {};
+			msg["id"] = $selectRow.id;
+			var jjj = {};
+			jjj["deleteAdminUser"] = msg;
+			$.submitControl(jjj, $.submitResult);
+		} else {
+			$.messager.alert('提示', '请选择要操作的行！', 'info');
+		}
+
+	};
+	$.submitResult = function(jsonResult) {
+		var code = jsonResult["code"];
+		if (code == 1) {
+			$.messager.show({
+				title : '提示',
+				msg : '删除完毕',
+				timeout : 3000,
+				showType : 'slide'
+			});
+			$("#querySubmit").click();
+		} else {
+			$.messager.alert('警告', '删除失败！错误码:' + code);
+		}
+	}
+</script>
+<script type="text/javascript">
+	function d_close() {
+		$('#add_dd').dialog('close');
+		$('#update_dd').dialog('close');
+	}
+	function reload() {
+		$("#querySubmit").click();
+	}
+</script>
+</head>
+<body class="easyui-layout" style="overflow-y: hidden;">
+
+	<button id="querySubmit" name="queryManagerUser" type="button" style="display: none" /></button>
+
+	<div data-options="region:'center'" style="background: #CCCCCC; overflow: auto; border: 5px;">
+		<table id="datagrid" class="easyui-datagrid" style="width: 800px; height: 500px; border: 0px" data-options="fitColumns:true,singleSelect:true">
+			<thead>
+				<tr>
+					<th data-options="field:'id',hidden:'true'">ID</th>
+					<th data-options="field:'password',hidden:'true'">password</th>
+					<th data-options="field:'name',width:250">用户名</th>
+					<th data-options="field:'type',width:250">类型</th>
+
+				</tr>
+			</thead>
+		</table>
+		<div id="add_dd"></div>
+		<div id="update_dd"></div>
+		<div id="pwd_dd"></div>
+	</div>
+</body>
+
+</html>

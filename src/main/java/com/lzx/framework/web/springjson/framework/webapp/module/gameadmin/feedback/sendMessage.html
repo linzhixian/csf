@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<script>
+
+		$('#tb').textbox({
+			buttonText : '发送',
+			prompt:'消息内容',
+			multiline:true,
+			width:'350px',
+			height:'150px',
+			onClickButton: function() {
+				var value=$('#tb').val();
+				if(value==null || value=="") {
+					$.messager.alert('错误','消息内容不能为空！');
+					return;
+				};
+				var msg={};
+				msg["content"]=value;
+				msg["uid"]=$('#uid').val();
+				var jjj={};
+				jjj["sendUserMessage"]=msg;
+				$.submitControl(jjj,$.submitSendmessageResult);
+			}
+		});
+		
+		$.submitSendmessageResult = function(jsonResult) {
+			var code=jsonResult["code"];
+			if(code==1) {
+				//$.messager.show('提示','发送完毕');
+				$.messager.show({
+					title:'提示',
+					msg:'发送完毕',
+					timeout:3000,
+					showType:'slide'
+				});
+				$('#dd').window('close');
+			} else {
+				$.messager.alert('警告','发送失败！错误码:'+code);
+			}
+		}
+	</script>
+	<input id="tb" type="text" style="width: 300px">
+	<input id="uid" type="text" style="display:none">
+</body>
+</html>

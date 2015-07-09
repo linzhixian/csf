@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../easyui/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<script type="text/javascript" src="../../../js/ajaxfileupload.js"></script>
+<script type="text/javascript" src="../../../easyui/datagrid-detailview.js"></script>
+<title>公告系统</title>
+<script>
+ $(document).ready(function() {
+	var toDate = new Date();
+	$('#starttime').val(myformatter(toDate));
+	$('#starttime').datetimebox('setValue', myformatter(toDate));
+	$('#endtime').val(myformatter(toDate));
+	$('#endtime').datetimebox('setValue', myformatter(toDate));
+}); 
+function myformatter(date) {
+	var y = date.getFullYear();
+	var m = date.getMonth() + 1;
+	var d = date.getDate();
+	var hour = date.getHours();
+	var min = date.getMinutes();
+	var timestr = y + '-' + (m < 10 ? ('0' + m) : m) + '-'
+			+ (d < 10 ? ('0' + d) : d) + " " + hour + ":" + min;
+	//alert("myformatter:"+timestr);
+	return timestr;
+}
+function myparser(s) {
+	if (!s)
+		return new Date();
+	//alert("myparser:"+s);
+	var ss = (s.split('-'));
+	var y = parseInt(ss[0], 10);
+	var m = parseInt(ss[1], 10)-1;
+	//var d = parseInt(ss[2], 10);
+	var ss = (ss[2].split(' '));
+	var d = parseInt(ss[0], 10);
+	var ss = (ss[1].split(':'));
+	var h = parseInt(ss[0], 10);
+
+	var min = parseInt(ss[1], 10);
+
+	if (!isNaN(y) && !isNaN(m) && !isNaN(d)) {
+		var dd = new Date(y, m, d);
+		dd.setHours(h);
+		dd.setMinutes(min);
+	//	alert("myparser:"+s+":"+myformatter(dd));
+		return dd;
+	} else {
+
+		return new Date();
+	}
+}
+
+
+
+function update_page(result) {
+	var gdJson = result["noticeResponse"];
+	//alert(JSON.stringify(result));
+	$('#datagrid').datagrid({
+		url : null,
+		data : gdJson
+	});
+	var notice_obj=gdJson["rows"];
+	//alert(JSON.stringify(notice_obj))
+};
+
+function gameupdate_page(result) {
+	var gdJson = result["gameNoticeResponse"];
+	//alert(JSON.stringify(result));
+	$('#datagrid2').datagrid({
+		url : null,
+		data : gdJson
+	});
+	var gamenotice_obj=gdJson["rows"];
+	//alert(JSON.stringify(gamenotice_obj))
+};
+
+$.openDialog=function(title,url,onLoadFunction) {
+	$('#dd').dialog({
+		title : title,
+		width : 1400,
+		height : 600,
+		closed : false,
+		cache : false,
+		href : url,
+		modal : true,
+		 onLoad :onLoadFunction
+	});
+};
+
+$.openDialog2=function(title,url,onLoadFunction) {
+	$('#dd2').dialog({
+		title : title,
+		width : 1400,
+		height : 600,
+		closed : false,
+		cache : false,
+		href : url,
+		modal : true,
+		 onLoad :onLoadFunction
+	});
+};
+
+$(function() {
+	$('#datagrid')
+			.datagrid(
+					{
+						title : '公告信息栏',
+						width : 1690,
+						height : 400,
+						remoteSort : false,
+						singleSelect : true,
+						nowrap : false,
+						fitColumns : true,
+						rownumbers:true,
+						url : 'datagrid_data.json',
+						columns : [ [ {
+							field:'id',hidden:'true'
+						},{
+							field:'type',hidden:'true'
+						},{
+							field : 'content',
+							title : '内容',
+							width : 100
+						},{
+							field : 'tigger',
+							title : '触发',
+							width : 100,
+							sortable : true,
+							hidden:'true'
+						},{
+							field : 'repeatnum',
+							title : '重复次数',
+							width : 100,
+							sortable : true,
+							hidden:'true'
+						}, {
+							field : 'scrolltime',
+							title : '滚屏时间',
+							width : 80,
+							align : 'right',
+							sortable : true,
+							hidden:'true'
+						}, {
+							field : 'intervaltime',
+							title : '间隔时间',
+							width : 80,
+							align : 'right',
+							sortable : true,
+							hidden:'true'
+						}, {
+							field : 'iscycle',
+							title : '是否循环',
+							width : 80,
+							sortable : true,
+							hidden:'true'
+						} , {
+							field : 'starttime',
+							title : '开始时间',
+							width : 40,
+							align : 'center'
+						}, {
+							field : 'endtime',
+							title : '结束时间',
+							width : 40,
+							align : 'center'
+						},{
+							field : 'status',
+							title : '公告状态',
+							width : 20,
+							sortable : true
+						} ] ],toolbar : [ {
+							text : '添加公告信息',
+							iconCls : 'icon-add',
+							handler : function() {
+								$.openDialog('公告信息','noticemessage.html');
+							}
+						}, '-', {
+							text : '修改',
+							iconCls : 'icon-edit',
+							handler : function() {
+								var $selectRow = $("#datagrid").datagrid("getSelected");
+								if ($selectRow) {
+									var id =  $selectRow.id;
+									var type = $selectRow.type;
+									var content=$selectRow.content;
+									var tigger=$selectRow.tigger;
+									var repeatnum=$selectRow.repeatnum;
+									var scrolltime=$selectRow.scrolltime;
+									var intervaltime=$selectRow.intervaltime;
+									var iscycle=$selectRow.iscycle;
+									 $.onLoadMofiyNotice=function() {
+											$("#dd #id").val(id);
+											$("#dd #type").val(type);
+											$("#dd #content1").val(content);
+											$("#dd #tigger1").val(tigger);
+											$("#dd #repeatnum1").val(repeatnum);
+											$("#dd #scrolltime1").val(scrolltime);
+											$("#dd #intervaltime1").val(intervaltime);
+											$("#dd #iscycle1").val(iscycle);
+										}
+									$.openDialog('修改滚屏公告','modifynoticemessage.html',$.onLoadMofiyNotice);
+								}else{
+									$.messager.alert('提示', '请选择要操作的行！');
+								}
+							}
+						}, '-', {
+							text : '删除',
+							iconCls : 'icon-remove',
+							handler : function() {
+								$.deleteNotice();
+							}
+
+						} ]
+					});
+});
+
+
+$(function() {
+	$('#datagrid2')
+			.datagrid(
+					{
+						title : '游戏公告',
+						width : 1690,
+						height : 400,
+						remoteSort : false,
+						singleSelect : true,
+						nowrap : false,
+						fitColumns : true,
+						rownumbers:true,
+						url : 'datagrid_data.json',
+						columns : [ [ {
+							field:'id',hidden:'true'
+						},{
+							field:'type',hidden:'true'
+						},{
+							field : 'content',
+							title : '内容',
+							width : 100
+						},{
+							field : 'tigger',
+							title : '触发',
+							width : 20,
+							sortable : true
+						},{
+							field : 'repeatnum',
+							title : '重复次数',
+							width : 20,
+							sortable : true
+						}, {
+							field : 'scrolltime',
+							title : '滚屏时间',
+							width : 20,
+							align : 'right',
+							sortable : true
+						}, {
+							field : 'intervaltime',
+							title : '间隔时间',
+							width : 20,
+							align : 'right',
+							sortable : true
+						}, {
+							field : 'iscycle',
+							title : '是否循环',
+							width : 20,
+							sortable : true
+						} , {
+							field : 'starttime',
+							title : '开始时间',
+							width : 40,
+							align : 'center'
+						}, {
+							field : 'endtime',
+							title : '结束时间',
+							width : 40,
+							align : 'center'
+						},{
+							field : 'status',
+							title : '公告状态',
+							width : 20,
+							sortable : true
+						} ] ],toolbar : [  {
+							text : '修改',
+							iconCls : 'icon-edit',
+							handler : function() {
+								var $selectRow = $("#datagrid2").datagrid("getSelected");
+								if ($selectRow) {
+									var id =  $selectRow.id;
+									var type = $selectRow.type;
+									var content=$selectRow.content;
+									var tigger=$selectRow.tigger;
+									var repeatnum=$selectRow.repeatnum;
+									var scrolltime=$selectRow.scrolltime;
+									var intervaltime=$selectRow.intervaltime;
+									var iscycle=$selectRow.iscycle;
+									 $.onLoadMofiyNotice=function() {
+											$("#dd2 #id").val(id);
+											$("#dd2 #type").val(type);
+											$("#dd2 #content1").val(content);
+											$("#dd2 #tigger1").val(tigger);
+											$("#dd2 #repeatnum1").val(repeatnum);
+											$("#dd2 #scrolltime1").val(scrolltime);
+											$("#dd2 #intervaltime1").val(intervaltime);
+											$("#dd2 #iscycle1").val(iscycle);
+										}
+									$.openDialog2('修改游戏公告','modifynoticemessage.html',$.onLoadMofiyNotice);
+								}else{
+									$.messager.alert('提示', '请选择要操作的行！');
+								}
+							}
+						} ]
+					});
+});
+
+$(document).ready(function() {
+	queryNoticeList();
+	gamequeryNoticeList();
+});
+
+function gamequeryNoticeList(){
+	var noticejsongameobj={"gameNotice":{"type":1,"id":1}};
+	//alert(JSON.stringify(noticejsonobj));
+	$.submitControl(noticejsongameobj, gameupdate_page);
+}
+
+function queryNoticeList(){
+	var noticejsonobj={"notice":{"type":2}};
+	//alert(JSON.stringify(noticejsonobj));
+	$.submitQuery(noticejsonobj, $.submitQueryCallBack);
+}
+
+$.deleteNotice = function() {
+	var $selectRow = $("#datagrid").datagrid("getSelected");
+	if ($selectRow) {
+		var msg = {};
+		msg["id"] = $selectRow.id;
+		var jjj = {};
+		jjj["deleteNotice"] = msg;
+		$.submitControl(jjj, $.submitResult);
+	} else {
+		$.messager.alert('提示', '请选择要操作的行！');
+	}
+
+};
+$.submitResult = function(jsonResult) {
+	var code = jsonResult["code"];
+	if (code == 1) {
+		$.messager.show({
+			title : '提示',
+			msg : '删除完毕',
+			timeout : 3000,
+			showType : 'slide'
+		});
+		queryNoticeList();
+	} else {
+		$.messager.alert('警告', '删除失败！错误码:' + code);
+	}
+}
+</script>
+</head>
+<body>
+
+<div data-options="region:'center'," style="background: #eee; overflow: auto;">
+<!-- <h4 align="center">滚屏公告信息栏</h4> -->
+		<table id="datagrid" border="0" width="1000" height="300"  cellspacing="0" cellpadding="0">
+			<!-- <h5 align="center">温馨提示：已发送状态的公告，可删除；待发送状态的公告，可编辑修改</h5> -->
+		</table>
+		<div id="dd"></div>
+	</div>
+
+<div data-options="region:'center'">
+<!-- <h4 align="center">滚屏公告信息栏</h4> -->
+		<table id="datagrid2" border="0" width="1000" height="300"  cellspacing="0" cellpadding="0">
+			<!-- <h5 align="center">温馨提示：已发送状态的公告，可删除；待发送状态的公告，可编辑修改</h5> -->
+		</table>
+		<div id="dd2"></div>
+	</div>
+</body>
+</html>

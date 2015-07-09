@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="../../../easyui/themes/icon.css">
+<script type="text/javascript" src="../../../easyui/jquery.min.js"></script>
+<script type="text/javascript" src="../../../easyui/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="../../../js/myquery.js"></script>
+<script type="text/javascript" src="../../../easyui/datagrid-detailview.js"></script>
+<script>
+	var gridRowsJson;
+	$(document)
+			.ready(
+					function() {
+						$("#userid")
+								.click(
+										function() {
+											if (($("#userid").val() == null
+													|| $("#userid").val().length == 0
+													|| $("#userid").val()[0] == null || $(
+													"#userid").val()[0] == "")
+													&& ($("#userrolename")
+															.val() == null
+															|| $(
+																	"#userrolename")
+																	.val().length == 0
+															|| $(
+																	"#userrolename")
+																	.val()[0] == null || $(
+															"#userrolename")
+															.val()[0] == "")) {
+												$("#userid").validatebox({
+													required : false,
+													validType : "text",
+												});
+												$("#userrolename").validatebox(
+														{
+															required : false,
+															validType : "text",
+														});
+											}
+
+										});
+
+						$("#userrolename")
+								.click(
+										function() {
+											if (($("#userid").val() == null
+													|| $("#userid").val().length == 0
+													|| $("#userid").val()[0] == null || $(
+													"#userid").val()[0] == "")
+													&& ($("#userrolename")
+															.val() == null
+															|| $(
+																	"#userrolename")
+																	.val().length == 0
+															|| $(
+																	"#userrolename")
+																	.val()[0] == null || $(
+															"#userrolename")
+															.val()[0] == "")) {
+												$("#userid").validatebox({
+													required : false,
+													validType : "text",
+												});
+												$("#userrolename").validatebox(
+														{
+															required : false,
+															validType : "text",
+														});
+											}
+
+										});
+					});
+
+	function myValidate(myValidate) {
+		if (($("#userid").val() == null || $("#userid").val().length == 0
+				|| $("#userid").val()[0] == null || $("#userid").val()[0] == "")
+				&& ($("#userrolename").val() == null
+						|| $("#userrolename").val().length == 0
+						|| $("#userrolename").val()[0] == null || $(
+						"#userrolename").val()[0] == "")) {
+
+			$("#userid").validatebox({
+				required : true,
+				validType : "text",
+				missingMessage : '用户ID和昵称必填一个'
+			});
+			$("#userrolename").validatebox({
+				required : true,
+				validType : "text",
+				missingMessage : '用户ID和昵称必填一个'
+			});
+			// alert("用户ID和昵称必填一个");
+			$.messager.alert("提示", "用户ID和昵称必填一个！");
+			return false;
+		} else {
+			return true;
+		}
+		return true;
+	}
+
+	function update_page(result) {
+		var gdJson = result["userInfoResponse"];
+		//alert(JSON.stringify(result));
+		gridRowsJson = gdJson["rows"];
+		$('#datagrid').datagrid({
+			url : null,
+			data : gdJson
+		});
+		var userresult=result["code"];
+		if(userresult!=1){
+			$.messager.alert("提示", "查无此人！");
+		}
+	};
+
+	$(function() {
+		$('#datagrid')
+				.datagrid(
+						{
+							title : '用户信息',
+							width : 1000,
+							height : 600,
+							remoteSort : false,
+							singleSelect : true,
+							nowrap : false,
+							fitColumns : true,
+							rownumbers:true,
+							url : 'datagrid_data.json',
+							columns : [ [ {
+								field : 'id',
+								title : '用户ID',
+								width : 80
+							}, {
+								field : 'rolename',
+								title : '昵称',
+								width : 100,
+								sortable : true
+							}, {
+								field : 'age',
+								title : '年龄',
+								width : 80,
+								align : 'right',
+								sortable : true
+							}, {
+								field : 'exp',
+								title : '经验值',
+								width : 80,
+								align : 'right',
+								sortable : true
+							}, {
+								field : 'gold',
+								title : '金币',
+								width : 80,
+								sortable : true
+							}, {
+								field : 'diamond',
+								title : '钻石',
+								width : 60,
+								align : 'center'
+							}, {
+								field : 'create_time',
+								title : '注册时间',
+								width : 200,
+								align : 'center'
+							}, {
+								field : 'seal_time',
+								title : '封停',
+								width : 200,
+								align : 'center'
+							} ] ],
+							view : detailview,
+							detailFormatter : function(rowIndex, rowData) {
+								return '<table  width="100%" border="0" bgcolor="#a1a1a1" cellspacing="0" cellpadding="0">'
+										+ '<tr  class="datagrid-header">'
+										+ '<td border="1">'
+										+ '<p>用户ID '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>昵称 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>年龄 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>经验值 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>金币 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>钻石 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>体力 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>骨头 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>奖杯 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>注册时间 '
+										+ '</p>'
+										+ '</td>'
+										+ '<td style="border:1">'
+										+ '<p>封停时间 '
+										+ '</p>'
+										+ '</td>'
+										+ '</tr>'
+
+										+ '<tr>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.id
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.rolename
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.age
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.exp
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.gold
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.diamond
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.strength
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.bone
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.cuplevel
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.create_time
+										+ '</p>'
+										+ '</td>'
+										+ '<td bgcolor="#ffffff">'
+										+ '<p>'
+										+ rowData.seal_time
+										+ '</p>'
+										+ '</td>'
+										+ '</tr>'
+
+										+ '</table>';
+							},
+							onClickCell : function(rowIndex, field, value) {
+								if (field == "seal_time") {
+									var rolename = gridRowsJson[rowIndex]["rolename"];
+									var uid = gridRowsJson[rowIndex]["id"];
+									$('#dd').dialog({
+										title : '封停用户[' + rolename + "]",
+										width : 800,
+										height : 600,
+										closed : false,
+										cache : false,
+										href : 'userSeal.html',
+										modal : true,
+										onLoad : function() {
+											$("#dd #uid").val(uid);
+										}
+									});
+								}
+							}
+						});
+	});
+</script>
+
+</head>
+<body class="easyui-layout" style="overflow-y: hidden" scroll="yes">
+
+	<div data-options="region:'north',split:true" style="height: 50px;" style="overflow:hidden">
+
+		<div style="overflow: hidden; position: relative; top: 10px; left: 30px; width: 90%; height: 100%">
+			<form id="ff" method="get">
+				用户ID:<input width="30" id="userid" name="id" type="text" class="easyui-validatebox" data-options="required:false,validType:'text'"> 昵称:<input type="text"
+					width="30" id="userrolename" name="rolename" class="easyui-validatebox" data-options="required:false,validType:'text'">
+
+				<button id="querySubmit" name="userInfo" type="button">查询</button>
+				&nbsp;&nbsp;&nbsp;Tips：先查询用户，点“封停”可对用户进行账号封停操作
+			</form>
+		</div>
+	</div>
+	<div data-options="region:'center'" style="background: #eee; overflow: auto;">
+		<table id="datagrid">
+
+		</table>
+		<div id="dd"></div>
+	</div>
+
+</body>
+
+</html>

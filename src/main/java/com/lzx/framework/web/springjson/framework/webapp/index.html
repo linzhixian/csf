@@ -1,0 +1,139 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="easyui/themes/black/easyui.css">
+<link rel="stylesheet" type="text/css" href="easyui/themes/icon.css">
+<script type="text/javascript" src="easyui/jquery.min.js"></script>
+<script type="text/javascript" src="easyui/jquery.easyui.min.js"></script>
+<script src="js/config.js" type="text/javascript"></script>
+<script src="js/myquery.js" type="text/javascript"></script>
+<script src="js/Default.js" type="text/javascript"></script>
+<style type="text/css">
+
+
+.white {
+	color: #FFFFFF;
+}
+
+.easyui-accordion ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 10px;
+	white-space:nowrap;
+}
+
+.easyui-accordion ul li {
+	padding: 0px;
+	font-size: 13;
+}
+
+.easyui-accordion ul li a {
+	line-height: 24px;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+.easyui-accordion ul li div {
+	background: #777777;
+	color: #CCCCCC;
+	margin: 2px 0px;
+	padding-left: 10px;
+	padding-top: 2px;
+}
+
+.easyui-accordion ul li div.hover {
+	background: #999999;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+
+.easyui-accordion ul li div.selected {
+	background: #999999;
+	cursor: default;
+	color: #000000;
+	font-weight: bold;
+}
+</style>
+
+<title>??</title>
+</head>
+<body class="easyui-layout" style="overflow-y: hidden" data-options="region:'north',split:true,style:{borderWidth:0}">
+	<noscript>
+		<div style="position: absolute; z-index: 100000; height: 2046px; top: 0px; left: 0px; width: 100%; background: white; text-align: center;">
+			<img src="images/noscript.gif" alt='抱歉，请开启脚本支持！' />
+		</div>
+	</noscript>
+	<div data-options="region:'north',split:true,style:{borderWidth:0}" style="background-image: url('img/bg1.jpg'); height: 55px; overflow: hidden">
+		<table width="100%" height="100%"  cellspacing="15" >
+			<tr>
+				<td>
+					<h3 class="white" id="site_title">??</h3>
+				</td>
+				<td align="right"><a href="javascript:void(0)" id="mb" class="easyui-menubutton" data-options="menu:'#mm',iconCls:'icon-my-account'"></a>
+					<div id="mm" style="width: 150px;">
+						<div onclick="modifyPassword();"  data-options="iconCls:'icon-pencil'"  >修改密码</div>
+						<div data-options="iconCls:'icon-logout'" onclick="logoutFun();">退出系统</div>
+
+					</div></td>
+			</tr>
+		</table>
+	</div>
+	<div data-options="region:'west',title:'',split:true,iconCls:'icon-home',style:{borderWidth:0}" style="width: 205px;overflow:hidden">
+		<div id="menu" class="easyui-accordion" data-options="fit:true,border:false,split:true" ></div>
+	</div>
+	<div id="cc" data-options="region:'center'," style="padding: 0px; background: #eee;">
+		<div id="main_panel" class="easyui-layout" data-options="fit:true">
+			<div id="seting_panel" data-options="region:'north',split:true" style="height: 41px; padding: 0px">
+				<table border=0 width="100%" style="font-size: 12px;">
+					<tr>
+						<td>
+							<table width="100%" style="font-size: 12px;" id="platformAndGameSelect">
+								<tr>
+									<td width="150">机型 <input id="platformSelect" class="easyui-combobox" />
+									</td>
+									<td width="10">|</td>
+									<td>游戏 <input id="moregame_id" class="easyui-combobox" />
+									</td>
+								</tr>
+							</table>
+
+						</td>
+					</tr>
+				</table>
+			</div>
+			<div data-options="region:'center'">
+				<div id="tabs" class="easyui-tabs" fit="true" border="false">
+					<div title="主页" style="padding: 20px; background-image: url('img/bg1.jpg')" id="home">
+						<table width="100%" height="100%">
+							<tr>
+								<td align="center"><h1 class="easyui-accordion">
+										<font color="#fffff">Welcome</font>
+									</h1></td>
+							</tr>
+							<tr>
+								<td align="center"><img src="img/v2.png" align="center" /></td>
+							</tr>
+
+						</table>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="dd"></div>
+
+
+
+</body>
+
+</html>

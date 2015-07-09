@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Expires" content="0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-control" content="no-cache">
+<meta http-equiv="Cache" content="no-cache">
+<title>Insert title here</title>
+
+</head>
+<body>
+	<script>
+	var isShowPlatformAndGameSelect = this.parent.isShowPlatformAndGameSelect;
+		$('#btn').linkbutton({
+			iconCls : 'icon-save'
+		});
+		$(function() {
+			$('#btn').bind('click', function() {
+				var nodes = $('#tt').tree('getChecked',['checked','indeterminate']);
+				var menuPermission=[];
+				 for(var i=0;i<nodes.length;i++){
+					 menuPermission.push(nodes[i].id);
+				 }
+	                    if(menuPermission.length==0){
+	                    	$.messager.alert('提示', '请选择用户权限');
+	                    	return;
+	                    }
+	                var chk_value =[];
+	                if(isShowPlatformAndGameSelect) {
+						$('input[name="gamename"]:checked').each(function(){ 						
+							//chk_value+='"'+$(this).val()+'",'; 
+							chk_value.push($(this).val());
+							}); 
+						if(chk_value.length==0){
+							$.messager.alert('提示', '请选择游戏');
+							return;
+						}
+			        }
+				$.onSubmitClick(this, $.submitSendmessageResult, false,JSON.stringify(menuPermission),JSON.stringify(chk_value));
+			});
+		});
+		$.submitSendmessageResult = function(jsonResult) {
+			var code = jsonResult["code"];
+			if (code == 1) {
+				//$.messager.show('提示','发送完毕');
+				$.messager.show({
+					title : '提示',
+					msg : '操作完毕',
+					timeout : 3000,
+					showType : 'slide'
+				});
+				$('#add_dd').window('close');
+				$("#querySubmit").click();
+
+			} else if (code == 7) {
+				$.messager.alert('错误', '操作失败! 用户已存在');
+
+			} else {
+				$.messager.alert('警告', '发送失败！错误码:' + code);
+			}
+		}
+		$.submitQuerygamenameResult = function(jsonResult) {
+			var querygamecheckbox=jsonResult["queryUserGamePermissionResponse"];
+			var allgames=querygamecheckbox["allgames"];
+			var arr = new Array();
+			var myobj=eval(allgames);
+			var gamecheckboxhtml2="";
+			for(var j=0;j<myobj.length;j++){
+				var gamecheckboxhtml="<input type='checkbox' name='gamename' value='";
+				gamecheckboxhtml+=myobj[j].name;
+				gamecheckboxhtml+="'\\>";
+				gamecheckboxhtml+=myobj[j].cn_name;
+				gamecheckboxhtml2+=gamecheckboxhtml;
+			}
+			document.getElementById("gameff").innerHTML = gamecheckboxhtml2;
+		}
+		//
+		$(document).ready(function() {
+				game_tree();
+				if(isShowPlatformAndGameSelect) {
+				  var querygamename={"queryUserGamePermission":{"id":-1}};
+				  $.submitControl(querygamename,$.submitQuerygamenameResult);
+				} else {
+					$("#gameSelect").hide();
+				}
+				$.parser.parse();
+		});
+		function game_tree(){
+			var mt={"getAddORupdatePermissionTree":{"id":-1}};
+			$.submitMenutreeResult = function(jsonResult) {
+				var tree_data2=jsonResult["getAddORupdatePermissionTreeResponse"]["rows"];
+				var tree_data=tree_data2;
+				$('#tt').tree({
+					checkbox:true, 
+				    data: tree_data
+				});
+			}
+			$.submitControl(mt,$.submitMenutreeResult);
+		}
+	</script>
+	<br>
+	<form id="ff" method="get">
+	&nbsp;&nbsp;<a id="btn" href="#" name="addAdminUser">保存</a>
+	<hr size=1 />
+	
+		<table width="300" align="center"  style="color:#EEEEEE">
+			<tr>
+				<td></td>
+			</tr>
+			<tr >
+				<td >用户名:<input class="easyui-validatebox" type="text" name="name" data-options="required:true" missingMessage="用户名必须填写" /></td>
+			</tr>
+			<tr>
+				<td>密&nbsp;码:<input class="easyui-validatebox" type="text" name="password" data-options="required:true" missingMessage="密码必须填写" /></td>
+			</tr>
+			<tr id="gameSelect">
+				<td>
+					<div>
+						<fieldset>
+           	 				<legend>游戏</legend>
+           	 				<div  id="gameff"></div>
+						</fieldset>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div>
+						<fieldset>
+           	 				<legend>权限管理</legend>
+						<ul id="tt" ></ul>
+						</fieldset>
+					</div>
+				</td>
+			</tr>
+
+		</table>
+	</form>
+</body>
+</html>
